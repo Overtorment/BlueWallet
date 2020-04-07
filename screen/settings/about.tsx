@@ -160,7 +160,7 @@ const About = () => {
         <BlueTextCentered>
           {getApplicationName()} ver {getVersion()} (build {getBuildNumber()})
         </BlueTextCentered>
-        <BlueTextCentered>{new Date(getBuildNumber() * 1000).toGMTString()}</BlueTextCentered>
+        <BlueTextCentered>{new Date(parseInt(getBuildNumber()) * 1000).toUTCString()}</BlueTextCentered>
         <BlueTextCentered>{getBundleId()}</BlueTextCentered>
         <BlueTextCentered>
           w, h = {width}, {height}
