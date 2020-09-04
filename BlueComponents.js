@@ -478,25 +478,47 @@ export const BlueAlertWalletExportReminder = ({ onSuccess = () => {}, onFailure 
   );
 };
 
-export const BlueNavigationStyle = (navigation, withNavigationCloseButton = false, customCloseButtonFunction = undefined) => {
+export const BlueNavigationStyle = (
+  navigation,
+  withNavigationCloseButton = false,
+  customCloseButtonFunction = undefined,
+  withNavigationCloseButtonPositionLeft = false,
+) => {
   let headerRight;
+  let headerLeft;
   const { colors, closeImage } = useTheme();
   if (withNavigationCloseButton) {
-    headerRight = () => (
-      <TouchableOpacity
-        style={{ width: 40, height: 40, padding: 14 }}
-        onPress={
-          customCloseButtonFunction === undefined
-            ? () => {
-                Keyboard.dismiss();
-                navigation.goBack(null);
-              }
-            : customCloseButtonFunction
-        }
-      >
-        <Image style={{ alignSelf: 'center' }} source={closeImage} />
-      </TouchableOpacity>
-    );
+    withNavigationCloseButtonPositionLeft
+      ? (headerLeft = () => (
+          <TouchableOpacity
+            style={{ width: 40, height: 40, padding: 14 }}
+            onPress={
+              customCloseButtonFunction === undefined
+                ? () => {
+                    Keyboard.dismiss();
+                    navigation.goBack(null);
+                  }
+                : customCloseButtonFunction
+            }
+          >
+            <Image style={{ alignSelf: 'center' }} source={closeImage} />
+          </TouchableOpacity>
+        ))
+      : (headerRight = () => (
+          <TouchableOpacity
+            style={{ width: 40, height: 40, padding: 14 }}
+            onPress={
+              customCloseButtonFunction === undefined
+                ? () => {
+                    Keyboard.dismiss();
+                    navigation.goBack(null);
+                  }
+                : customCloseButtonFunction
+            }
+          >
+            <Image style={{ alignSelf: 'center' }} source={closeImage} />
+          </TouchableOpacity>
+        ));
   } else {
     headerRight = null;
   }
@@ -512,6 +534,7 @@ export const BlueNavigationStyle = (navigation, withNavigationCloseButton = fals
       fontWeight: '600',
       color: colors.foregroundColor,
     },
+    headerLeft,
     headerRight,
     headerBackTitleVisible: false,
     headerTintColor: colors.foregroundColor,
@@ -603,6 +626,55 @@ export class BlueCopyTextToClipboard extends Component {
       return { hasTappedText: state.hasTappedText, address: state.address };
     } else {
       return { hasTappedText: state.hasTappedText, address: props.text };
+    }
+  }
+
+  copyToClipboard = () => {
+    this.setState({ hasTappedText: true }, () => {
+      Clipboard.setString(this.props.text);
+      this.setState({ address: loc.wallets.xpub_copiedToClipboard }, () => {
+        setTimeout(() => {
+          this.setState({ hasTappedText: false, address: this.props.text });
+        }, 1000);
+      });
+    });
+  };
+
+  render() {
+    return (
+      <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 16 }}>
+        <TouchableOpacity onPress={this.copyToClipboard} disabled={this.state.hasTappedText}>
+          <Animated.Text style={styleCopyTextToClipboard.address} numberOfLines={0}>
+            {this.state.address}
+          </Animated.Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+}
+
+export class BlueCopyLongTextToClipboard extends Component {
+  static propTypes = {
+    text: PropTypes.string,
+  };
+
+  static defaultProps = {
+    text: '',
+  };
+
+  constructor(props) {
+    super(props);
+    if (Platform.OS === 'android') {
+      UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+    this.state = { hasTappedText: false, address: loc.wallets.copy_to_clipboard };
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    if (state.hasTappedText) {
+      return { hasTappedText: state.hasTappedText, address: state.address };
+    } else {
+      return { hasTappedText: state.hasTappedText, address: loc.wallets.copy_to_clipboard };
     }
   }
 
