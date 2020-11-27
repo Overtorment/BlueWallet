@@ -294,6 +294,41 @@ const App = () => {
   );
 };
 
+// eslint-disable-next-line react/prop-types
+const BlueGlobalMessageContainer = ({ children }) => {
+  const { show, hide } = useContext(BlueGlobalMessageContext);
+
+  const showGlobalMessage = useCallback(
+    (event, dismissable = true, type = BlueGlobalMessageType.LOADING) => {
+      hide();
+      show({ message: event, dismissable, type });
+    },
+    [hide, show],
+  );
+
+  useEffect(() => {
+    EV(EV.enum.GLOBAL_MESSAGES_IMPORTING_WALLET, () =>
+      showGlobalMessage(loc.wallets.importing_wallet, false, BlueGlobalMessageType.LOADING),
+    );
+    EV(EV.enum.GLOBAL_MESSAGES_HIDE, () => setTimeout(hide, 1500));
+    EV(EV.enum.GLOBAL_MESSAGES_ERROR_WALLET_ALREADY_IMPORTED, () =>
+      showGlobalMessage(loc.wallets.wallet_already_imported, true, BlueGlobalMessageType.WARNING),
+    );
+    EV(EV.enum.GLOBAL_MESSAGES_IMPORT_WALLET_SUCCESS, () =>
+      showGlobalMessage(loc.wallets.import_success, true, BlueGlobalMessageType.SUCCESS),
+    );
+    EV(EV.enum.GLOBAL_MESSAGES_ERROR_WALLET_IMPORT, () => showGlobalMessage(loc.wallets.import_error, true, BlueGlobalMessageType.ERROR));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <View style={styles.root}>
+      {children}
+      <BlueGlobalMessage />
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   root: {
     flex: 1,
