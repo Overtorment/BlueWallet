@@ -36,6 +36,7 @@ import WalletImport from './class/wallet-import';
 import Biometric from './class/biometrics';
 import WidgetCommunication from './blue_modules/WidgetCommunication';
 import changeNavigationBarColor from 'react-native-navigation-bar-color';
+import LNDWalletDelegate from './components/LNDWalletDelegate';
 const A = require('./blue_modules/analytics');
 
 const eventEmitter = new NativeEventEmitter(NativeModules.EventEmitter);
@@ -341,6 +342,7 @@ const App = () => {
       <WalletImport />
       <Biometric />
       <WidgetCommunication />
+      <LNDWalletDelegate />
     </SafeAreaProvider>
   );
 };

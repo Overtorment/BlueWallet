@@ -17,6 +17,7 @@ import {
   BlueText,
   BlueListItem,
   LightningButton,
+  LndButton,
   BitcoinButton,
   VaultButton,
   BlueFormLabel,
@@ -25,23 +26,32 @@ import {
   BlueSpacing20,
 } from '../../BlueComponents';
 import navigationStyle from '../../components/navigationStyle';
-import { HDSegwitBech32Wallet, SegwitP2SHWallet, HDSegwitP2SHWallet, LightningCustodianWallet, AppStorage } from '../../class';
+import {
+  HDSegwitBech32Wallet,
+  SegwitP2SHWallet,
+  HDSegwitP2SHWallet,
+  LightningCustodianWallet,
+  AppStorage,
+  LightningLndWallet,
+} from '../../class';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import { useTheme, useNavigation } from '@react-navigation/native';
 import { Chain } from '../../models/bitcoinUnits';
 import loc from '../../loc';
 import { BlueStorageContext } from '../../blue_modules/storage-context';
 const A = require('../../blue_modules/analytics');
+const confirm = require('../../helpers/confirm');
 
 const ButtonSelected = Object.freeze({
   ONCHAIN: Chain.ONCHAIN,
   OFFCHAIN: Chain.OFFCHAIN,
   VAULT: 'VAULT',
+  LND: 'LND',
 });
 
 const WalletsAdd = () => {
   const { colors } = useTheme();
-  const { addWallet, saveToDisk, isAdancedModeEnabled } = useContext(BlueStorageContext);
+  const { addWallet, saveToDisk, isAdancedModeEnabled, wallets } = useContext(BlueStorageContext);
   const [isLoading, setIsLoading] = useState(true);
   const [walletBaseURI, setWalletBaseURI] = useState();
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -152,7 +162,42 @@ const WalletsAdd = () => {
     } else if (selectedWalletType === ButtonSelected.VAULT) {
       setIsLoading(false);
       navigate('WalletsAddMultisig', { walletLabel: label.trim().length > 0 ? label : loc.multisig.default_label });
+    } else if (selectedWalletType === ButtonSelected.LND) {
+      setIsLoading(false);
+      createLightningLndWallet(w);
     }
+  };
+
+  const createLightningLndWallet = async wallet => {
+    const foundLnd = wallets.find(w => w.type === LightningLndWallet.type);
+    if (foundLnd) {
+      return alert('LND wallet already exists');
+    }
+    setIsLoading(true);
+    wallet = new LightningLndWallet();
+    wallet.setLabel(label || loc.wallets.details_title);
+
+    try {
+      await wallet.generateAsync();
+    } catch (Err) {
+      console.warn('lnd create failure', Err);
+      if (await confirm('Wipe .lnd dir?', Err.message)) {
+        const lnd = new LightningLndWallet();
+        await lnd.wipeLndDir();
+      }
+      return;
+      // giving app, not adding anything
+    } finally {
+      setIsLoading(false);
+    }
+    addWallet(wallet);
+    await saveToDisk();
+
+    A(A.ENUM.CREATED_WALLET);
+    ReactNativeHapticFeedback.trigger('notificationSuccess', { ignoreAndroidSystemSettings: false });
+    navigate('PleaseBackupLnd', {
+      walletID: wallet.getID(),
+    });
   };
 
   const createLightningWallet = async wallet => {
@@ -213,6 +258,11 @@ const WalletsAdd = () => {
     setSelectedWalletType(ButtonSelected.OFFCHAIN);
   };
 
+  const handleOnLndButtonPressed = async () => {
+    Keyboard.dismiss();
+    setSelectedWalletType(ButtonSelected.LND);
+  };
+
   return (
     <ScrollView style={stylesHook.root}>
       <StatusBar barStyle="light-content" />
@@ -244,6 +294,7 @@ const WalletsAdd = () => {
             onPress={handleOnLightningButtonPressed}
             style={styles.button}
           />
+          <LndButton active={selectedWalletType === ButtonSelected.LND} onPress={handleOnLndButtonPressed} style={styles.button} />
           <VaultButton active={selectedWalletType === ButtonSelected.VAULT} onPress={handleOnVaultButtonPressed} style={styles.button} />
         </View>
 

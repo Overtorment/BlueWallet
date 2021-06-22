@@ -30,6 +30,7 @@ import WalletsAddMultisigStep2 from './screen/wallets/addMultisigStep2';
 import WalletsAddMultisigHelp from './screen/wallets/addMultisigHelp';
 import PleaseBackup from './screen/wallets/pleaseBackup';
 import PleaseBackupLNDHub from './screen/wallets/pleaseBackupLNDHub';
+import PleaseBackupLnd from './screen/wallets/pleaseBackupLnd';
 import ImportWallet from './screen/wallets/import';
 import WalletDetails from './screen/wallets/details';
 import WalletExport from './screen/wallets/export';
@@ -75,6 +76,8 @@ import ScanLndInvoice from './screen/lnd/scanLndInvoice';
 import LappBrowser from './screen/lnd/browser';
 import LNDCreateInvoice from './screen/lnd/lndCreateInvoice';
 import LNDViewInvoice from './screen/lnd/lndViewInvoice';
+import LndOpenChannel from './screen/lnd/lndOpenChannel';
+import LndInfo from './screen/lnd/lndInfo';
 import LNDViewAdditionalInvoiceInformation from './screen/lnd/lndViewAdditionalInvoiceInformation';
 import LnurlPay from './screen/lnd/lnurlPay';
 import LnurlPaySuccess from './screen/lnd/lnurlPaySuccess';
@@ -83,6 +86,7 @@ import DrawerList from './screen/wallets/drawerList';
 import { isDesktop, isTablet } from './blue_modules/environment';
 import SettingsPrivacy from './screen/settings/SettingsPrivacy';
 import LNDViewAdditionalInvoicePreImage from './screen/lnd/lndViewAdditionalInvoicePreImage';
+import LNDViewLogs from './screen/wallets/lndViewLogs';
 
 const defaultScreenOptions =
   Platform.OS === 'ios'
@@ -120,7 +124,10 @@ const WalletsRoot = () => {
     <WalletsStack.Navigator {...(Platform.OS === 'android' ? { screenOptions: defaultScreenOptions } : null)}>
       <WalletsStack.Screen name="WalletsList" component={WalletsList} options={WalletsList.navigationOptions(theme)} />
       <WalletsStack.Screen name="WalletTransactions" component={WalletTransactions} options={WalletTransactions.navigationOptions(theme)} />
+      <WalletsStack.Screen name="LndOpenChannel" component={LndOpenChannel} options={LndOpenChannel.navigationOptions(theme)} />
+      <WalletsStack.Screen name="LndInfo" component={LndInfo} options={LndInfo.navigationOptions(theme)} />
       <WalletsStack.Screen name="WalletDetails" component={WalletDetails} options={WalletDetails.navigationOptions(theme)} />
+      <WalletsStack.Screen name="LNDViewLogs" component={LNDViewLogs} options={LNDViewLogs.navigationOptions(theme)} />
       <WalletsStack.Screen name="TransactionDetails" component={TransactionDetails} options={TransactionDetails.navigationOptions(theme)} />
       <WalletsStack.Screen name="TransactionStatus" component={TransactionStatus} options={TransactionStatus.navigationOptions(theme)} />
       <WalletsStack.Screen name="HodlHodl" component={HodlHodl} options={HodlHodl.navigationOptions(theme)} />
@@ -197,6 +204,7 @@ const AddWalletRoot = () => {
         component={PleaseBackupLNDHub}
         options={PleaseBackupLNDHub.navigationOptions(theme)}
       />
+      <AddWalletStack.Screen name="PleaseBackupLnd" component={PleaseBackupLnd} options={PleaseBackupLnd.navigationOptions(theme)} />
       <AddWalletStack.Screen name="ProvideEntropy" component={ProvideEntropy} options={ProvideEntropy.navigationOptions(theme)} />
       <AddWalletStack.Screen
         name="WalletsAddMultisig"

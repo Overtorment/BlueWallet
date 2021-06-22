@@ -32,6 +32,7 @@ import {
   WatchOnlyWallet,
   MultisigHDWallet,
   HDAezeedWallet,
+  LightningLndWallet,
 } from '../../class';
 import { ScrollView } from 'react-native-gesture-handler';
 import loc from '../../loc';
@@ -42,6 +43,8 @@ import { BlueStorageContext } from '../../blue_modules/storage-context';
 import Notifications from '../../blue_modules/notifications';
 import { isDesktop } from '../../blue_modules/environment';
 import { AbstractHDElectrumWallet } from '../../class/wallets/abstract-hd-electrum-wallet';
+import TooltipMenu from '../../components/TooltipMenu';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 const prompt = require('../../blue_modules/prompt');
 
@@ -126,6 +129,10 @@ const WalletDetails = () => {
   const { goBack, navigate, setOptions, popToTop } = useNavigation();
   const { colors } = useTheme();
   const [masterFingerprint, setMasterFingerprint] = useState();
+  const [lightningWalletInfo, setLightningWalletInfo] = useState({});
+  const identityPubKeyAnchorRef = useRef();
+  const identityPubKeyTooltipRef = useRef();
+
   useEffect(() => {
     if (isAdvancedModeEnabledRender && wallet.allowMasterFingerprint()) {
       InteractionManager.runAfterInteractions(() => {
@@ -153,6 +160,11 @@ const WalletDetails = () => {
       backgroundColor: colors.inputBackgroundColor,
     },
   });
+  useEffect(() => {
+    if (wallet.type === LightningLndWallet.type) {
+      wallet.getInfo().then(setLightningWalletInfo);
+    }
+  }, [wallet]);
 
   const setLabel = () => {
     setIsLoading(true);
@@ -263,6 +275,11 @@ const WalletDetails = () => {
         address: wallet.getAllExternalAddresses()[0], // works for both single address and HD wallets
       },
     });
+  const navigateToLNDViewLogs = () => {
+    navigate('LNDViewLogs', {
+      walletID,
+    });
+  };
 
   const navigateToAddresses = () =>
     navigate('WalletAddresses', {
@@ -423,6 +440,22 @@ const WalletDetails = () => {
     );
   };
 
+  const handleOnCopyIdentityPubKeyTap = () => {
+    Clipboard.setString(lightningWalletInfo?.identityPubkey);
+  };
+
+  const showToolTipMenu = () => {
+    identityPubKeyTooltipRef.current.showMenu();
+  };
+
+  const toolTipActions = [
+    {
+      id: 'copy',
+      text: loc.transactions.details_copy,
+      onPress: handleOnCopyIdentityPubKeyTap,
+    },
+  ];
+
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
@@ -472,6 +505,21 @@ const WalletDetails = () => {
               <Text style={[styles.textLabel1, stylesHook.textLabel1]}>{loc.wallets.details_type.toLowerCase()}</Text>
               <Text style={[styles.textValue, stylesHook.textValue]}>{wallet.typeReadable}</Text>
 
+              {wallet.type === LightningLndWallet.type && (
+                <>
+                  <Text style={[styles.textLabel2, stylesHook.textLabel2]}>{loc.wallets.identity_pubkey}</Text>
+                  {lightningWalletInfo?.identityPubkey ? (
+                    <>
+                      <TooltipMenu ref={identityPubKeyTooltipRef} anchorRef={identityPubKeyAnchorRef} actions={toolTipActions} />
+                      <BlueText onLongPress={showToolTipMenu} ref={identityPubKeyAnchorRef}>
+                        {lightningWalletInfo.identityPubkey}
+                      </BlueText>
+                    </>
+                  ) : (
+                    <ActivityIndicator />
+                  )}
+                </>
+              )}
               {wallet.type === MultisigHDWallet.type && (
                 <>
                   <Text style={[styles.textLabel2, stylesHook.textLabel2]}>{loc.wallets.details_multisig_type}</Text>
@@ -483,7 +531,6 @@ const WalletDetails = () => {
                   </BlueText>
                 </>
               )}
-
               {wallet.type === MultisigHDWallet.type && (
                 <>
                   <Text style={[styles.textLabel2, stylesHook.textLabel2]}>{loc.multisig.how_many_signatures_can_bluewallet_make}</Text>
@@ -504,6 +551,7 @@ const WalletDetails = () => {
                   <BlueText>{wallet.getIdentityPubkey()}</BlueText>
                 </>
               )}
+              <BlueSpacing20 />
               <>
                 <Text onPress={exportInternals} style={[styles.textLabel2, stylesHook.textLabel2]}>
                   {loc.transactions.list_title.toLowerCase()}
@@ -595,6 +643,12 @@ const WalletDetails = () => {
                   <>
                     <BlueSpacing20 />
                     <SecondButton onPress={navigateToSignVerify} testID="SignVerify" title={loc.addresses.sign_title} />
+                  </>
+                )}
+                {wallet.type === LightningLndWallet.type && (
+                  <>
+                    <BlueSpacing20 />
+                    <SecondButton onPress={navigateToLNDViewLogs} testID="LNDLogs" title={loc.lnd.view_logs} />
                   </>
                 )}
                 <BlueSpacing20 />

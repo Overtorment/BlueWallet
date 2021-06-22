@@ -17,7 +17,11 @@ const AddressInput = ({
   placeholder = loc.send.details_address,
   onChangeText,
   onBarScanned,
+  onBarScannerDismissWithoutData = () => {},
+  scanButtonTapped = () => {},
   launchedBy,
+  editable = true,
+  inputAccessoryViewID,
 }) => {
   const { colors } = useTheme();
   const scanButtonRef = useRef();
@@ -42,35 +46,41 @@ const AddressInput = ({
         testID="AddressInput"
         onChangeText={onChangeText}
         placeholder={placeholder}
-        numberOfLines={1}
+        numberOfLines={editable ? 0 : 1}
         placeholderTextColor="#81868e"
         value={address}
         style={styles.input}
-        editable={!isLoading}
+        editable={!isLoading && editable}
         onSubmitEditing={Keyboard.dismiss}
+        multiline={!editable}
+        inputAccessoryViewID={inputAccessoryViewID}
       />
-      <TouchableOpacity
-        testID="BlueAddressInputScanQrButton"
-        disabled={isLoading}
-        onPress={() => {
-          Keyboard.dismiss();
-          if (isDesktop) {
-            fs.showActionSheet({ anchor: findNodeHandle(scanButtonRef.current) }).then(onBarScanned);
-          } else {
-            NavigationService.navigate('ScanQRCodeRoot', {
-              screen: 'ScanQRCode',
-              params: {
-                launchedBy,
-                onBarScanned,
-              },
-            });
-          }
-        }}
-        style={[styles.scan, stylesHook.scan]}
-      >
-        <Image source={require('../img/scan-white.png')} />
-        <Text style={[styles.scanText, stylesHook.scanText]}>{loc.send.details_scan}</Text>
-      </TouchableOpacity>
+      {editable && (
+        <TouchableOpacity
+          testID="BlueAddressInputScanQrButton"
+          disabled={isLoading}
+          onPress={() => {
+            Keyboard.dismiss();
+            scanButtonTapped();
+            if (isDesktop) {
+              fs.showActionSheet({ anchor: findNodeHandle(scanButtonRef.current) }).then(onBarScanned);
+            } else {
+              NavigationService.navigate('ScanQRCodeRoot', {
+                screen: 'ScanQRCode',
+                params: {
+                  launchedBy,
+                  onBarScanned,
+                  onDismiss: onBarScannerDismissWithoutData,
+                },
+              });
+            }
+          }}
+          style={[styles.scan, stylesHook.scan]}
+        >
+          <Image source={require('../img/scan-white.png')} />
+          <Text style={[styles.scanText, stylesHook.scanText]}>{loc.send.details_scan}</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -115,6 +125,10 @@ AddressInput.propTypes = {
   launchedBy: PropTypes.string,
   address: PropTypes.string,
   placeholder: PropTypes.string,
+  editable: PropTypes.bool,
+  scanButtonTapped: PropTypes.func,
+  inputAccessoryViewID: PropTypes.string,
+  onBarScannerDismissWithoutData: PropTypes.func,
 };
 
 export default AddressInput;

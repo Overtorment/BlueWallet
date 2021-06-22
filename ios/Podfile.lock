@@ -354,6 +354,9 @@ PODS:
     - React
   - RemobileReactNativeQrcodeLocalImage (1.0.4):
     - React
+  - rn-lnd (0.1.8):
+    - React-Core
+    - SwiftProtobuf
   - RNCAsyncStorage (1.15.4):
     - React-Core
   - RNCClipboard (1.7.0):
@@ -431,6 +434,7 @@ PODS:
   - Sentry (7.0.0):
     - Sentry/Core (= 7.0.0)
   - Sentry/Core (7.0.0)
+  - SwiftProtobuf (1.17.0)
   - SwiftSocket (2.0.2)
   - ToolTipMenu (5.2.0):
     - React
@@ -504,6 +508,7 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - RealmJS (from `../node_modules/realm`)
   - "RemobileReactNativeQrcodeLocalImage (from `../node_modules/@remobile/react-native-qrcode-local-image`)"
+  - rn-lnd (from `../node_modules/rn-lnd`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCClipboard (from `../node_modules/@react-native-clipboard/clipboard`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
@@ -546,6 +551,7 @@ SPEC REPOS:
     - libevent
     - OpenSSL-Universal
     - Sentry
+    - SwiftProtobuf
     - YogaKit
 
 EXTERNAL SOURCES:
@@ -637,6 +643,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/realm"
   RemobileReactNativeQrcodeLocalImage:
     :path: "../node_modules/@remobile/react-native-qrcode-local-image"
+  rn-lnd:
+    :path: "../node_modules/rn-lnd"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNCClipboard:
@@ -753,6 +761,7 @@ SPEC CHECKSUMS:
   ReactCommon: 73d79c7039f473b76db6ff7c6b159c478acbbb3b
   RealmJS: 8a51eff2b9eaabf78b53a6819da6da6edde27467
   RemobileReactNativeQrcodeLocalImage: 57aadc12896b148fb5e04bc7c6805f3565f5c3fa
+  rn-lnd: 3d8992d2c33dc49e7fa83daebdc1c8cc8774f6da
   RNCAsyncStorage: b17c417b356114699a486715adfa5829a5d6d8b9
   RNCClipboard: dac13db8b1ce9b998f1cbc7ca33440113602847f
   RNCMaskedView: f127cd9652acfa31b91dcff613e07ba18b774db6
@@ -777,11 +786,12 @@ SPEC CHECKSUMS:
   RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
   RNWatch: e4c5d19506c94506860032fb68aedd5991beb985
   Sentry: 89d26e036063b9cb9caa59b6951dd2f8277aa13b
+  SwiftProtobuf: 9c85136c6ba74b0a1b84279dbf0f6db8efb714e0
   SwiftSocket: c8d482e867ae4d3eb4c769e9382e123c1f1f833b
   ToolTipMenu: 4d89d95ddffd7539230bdbe02ee51bbde362e37e
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 73464a154246ad233697748ecc693fe37cb2eacb
+PODFILE CHECKSUM: 41bde9bbbccb2ce9ee331ac4273e93aca8993653
 
 COCOAPODS: 1.10.1

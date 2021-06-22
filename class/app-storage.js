@@ -17,6 +17,7 @@ import {
   HDSegwitElectrumSeedP2WPKHWallet,
   HDAezeedWallet,
   MultisigHDWallet,
+  LightningLndWallet,
   SLIP39SegwitP2SHWallet,
   SLIP39LegacyP2PKHWallet,
   SLIP39SegwitBech32Wallet,
@@ -365,6 +366,10 @@ export class AppStorage {
           case HDAezeedWallet.type:
             unserializedWallet = HDAezeedWallet.fromJson(key);
             break;
+          case LightningLndWallet.type:
+            unserializedWallet = LightningLndWallet.fromJson(key);
+            unserializedWallet.init();
+            break;
           case SLIP39SegwitP2SHWallet.type:
             unserializedWallet = SLIP39SegwitP2SHWallet.fromJson(key);
             break;
@@ -427,6 +432,23 @@ export class AppStorage {
   deleteWallet = wallet => {
     const secret = wallet.getSecret();
     const tempWallets = [];
+
+    if (wallet.type === LightningLndWallet.type) {
+      /** @type {LightningLndWallet} */
+      const lndwallet = wallet;
+      (() => {
+        // scheduled for execution later
+        try {
+          lndwallet.stop().finally(async () => {
+            await lndwallet.wipeLndDir();
+          });
+        } catch (_) {
+        } finally {
+          alert('LND wallet deleted. To create another LND wallet please restart the app');
+          // as starting LND again will crash the whole app (known LND bug)
+        }
+      })();
+    }
 
     for (const value of this.wallets) {
       if (value.type === PlaceholderWallet.type) {
